@@ -1,4 +1,4 @@
-import { KEY } from 'define.js';
+import { KEY } from './define.js';
 
 export class idol {
     constructor(id){

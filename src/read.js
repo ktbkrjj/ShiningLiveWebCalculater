@@ -1,5 +1,5 @@
 import { KEY } from "./define.js";
-import { idol } from "idolData.js";
+import { idol } from "./idolData.js";
 
 // File APIに対応しているか確認
 if(window.File) {
