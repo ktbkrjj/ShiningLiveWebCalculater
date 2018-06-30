@@ -1,6 +1,6 @@
 import { KEY } from './define.js';
 
-export class idol {
+export default class idol {
     constructor(id){
         var str = localStorage.getItem(KEY + id);
         var obj = JSON.parse(str);
