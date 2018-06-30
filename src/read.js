@@ -58,4 +58,4 @@ button.onclick = function() {
     insert += '</tr>';
     insert += '</table>';
     result.innerHTML = insert;
-};
+}
