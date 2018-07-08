@@ -21,6 +21,7 @@ class Idol {
 }
 
 // constant
+const TeamNumber = 7;
 const Attributes = ["Star", "Shine", "Dream"];
 const Types = ["None", "Dance", "Vocal", "Act"];
 const MainSkillLevels = ["50", "53", "56", "60", "63", "66", "70"];
@@ -71,9 +72,20 @@ function SetOptions(classname, array, defaultValue) {
 
 // sotable list
 {
-    Sortable.create(list, { group: "idol", animation: 100, onSort: Caluculate });
-    let insert = "";
+    Sortable.create(list1, { group: "idol", animation: 100,
+    onSort: function() {
+        Sort();
+        Caluculate();
+    }});
+
+    Sortable.create(list2, { group: "idol", animation: 100, 
+    onSort: function() {
+        Sort();
+        Caluculate();
+    }});
+
     let array = getIdolArray();
+    let insert = "";
     for (let id = 0; id < array.length; id++) {
         insert += "<table><tr>"
         insert += "<td class=\"idolName\" id=" + id + ">" + array[id].Name + "</td>";
@@ -87,7 +99,23 @@ function SetOptions(classname, array, defaultValue) {
         insert += "<td class=\"td-ssl\">" + array[id].SubSkillLevel + "</td>";
         insert += "</tr></table>\n";
     }
-    list.innerHTML = insert;
+    list1.innerHTML = insert;
+}
+
+function Sort() {
+    let list1 = document.getElementById("list1");
+    let list2 = document.getElementById("list2");
+    const all = Array.from(list1.children).concat(Array.from(list2.children));
+    let str = "";
+    for (let index = 0; index < TeamNumber;index++) {
+        str += "<table>" + all[index].innerHTML + "</table>\n";
+    }
+    list1.innerHTML = str;
+    str = "";
+    for (let index = TeamNumber; index < all.length;index++) {
+        str += "<table>" + all[index].innerHTML + "</table>\n";
+    }
+    list2.innerHTML = str;
 }
 
 function getIdolArray() {
@@ -170,7 +198,7 @@ if(window.File) {
 function Caluculate() {
     let elements = document.getElementsByClassName("idolName") ;
     let total = 0;
-    for (let index = 0; index < 7;index++) {
+    for (let index = 0; index < TeamNumber;index++) {
         let idol = new Idol(elements[index].id)
         total += idol.Dance + idol.Vocal + idol.Act;
         total += getMainSkillBonus(idol);
@@ -253,4 +281,6 @@ function getEventBonus(idol) {
             return 0;
     }
 }
+
+Sort();
 Caluculate();
