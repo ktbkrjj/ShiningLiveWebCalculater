@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <title>FileRead</title>
+        <link rel="stylesheet" type="text/css" href="css/table.css">
+    </head>
+    <body>
+        <div></div>
+        </br></br>
+        <div>メインスキル　：
+            <select class="type" id="main-skill"></select>
+            <select class="mainskilllevel" id="main-skill-level"></select>％
+        </div>
+        <div>フレンド属性　：
+            <span class="attribute" id="friend"></span>
+        </div>
+        <div>フレンドスキル：
+            <select class="type" id="friend-skill"></select>
+            <select class="mainskilllevel" id="friend-skill-level"></select>％
+        </div>
+        <div>楽曲属性　　　：
+            <span class="attribute" id="song"></span>
+        </div>
+        <div>イベントボーナス：
+            <select class="type" id="event-bonus"></select>
+        </div>
+        </br>
+        <div id="result"></div>
+        </br>
+        <div id="list"></div>
+        </br></br>
+        <input type="file" name="select" id="select" />
+        <script src="node_modules/sortablejs/Sortable.min.js"></script>
+        <script src="src/read.js"></script>
+    </body>
+</html>
