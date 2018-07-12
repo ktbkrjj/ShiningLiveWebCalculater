@@ -3,11 +3,13 @@ const KEY = "ShiningLiveData";
 // class definition
 class Idol {
     constructor(id){
-        let str = localStorage.getItem(KEY);
-        let idols = JSON.parse(str);
-        let idol = idols[id];
+        const str = localStorage.getItem(KEY);
+        if (str == null) return; 
+        const idols = JSON.parse(str);
+        const idol = idols[id];
         if (idol == null) return; 
         this.data = idol;
+        this.ID = idol.ID;
         this.Name = idol.Name;
         this.Attribute = idol.Attribute;
         this.Dance = Number(idol.Dance);
@@ -31,16 +33,14 @@ const MainSkillLevels = ["50", "53", "56", "60", "63", "66", "70"];
 {
     SetOptions("type", Types);
     SetOptions("mainskilllevel", MainSkillLevels, "60");
-    let elements = document.getElementsByTagName("select");
-    for (let element of elements) {
-        element.onchange = Caluculate;
-    }
+    let elements = Array.from(document.getElementsByTagName("select"));
+    elements.forEach(n => n.onchange = Caluculate);
 }
 //radio button
 {
     let elements = document.getElementsByClassName("attribute");
     for (let element of elements) {
-        for (let attribute of Attributes) {
+        Attributes.forEach(attribute => {
             let radio = document.createElement("input");
             radio.type = "radio";
             radio.name = "radio-" + element.id;
@@ -51,7 +51,7 @@ const MainSkillLevels = ["50", "53", "56", "60", "63", "66", "70"];
             let label = document.createElement("label");
             label.innerHTML = "<label for=\"" + radio.id + "\">" + attribute + "</label> ";
             element.appendChild(label);
-        }
+        });
     }
 }
 
@@ -59,47 +59,56 @@ function SetOptions(classname, array, defaultValue) {
     let elements = document.getElementsByClassName(classname);
     for (let element of elements) {
         let opt = "";
-        for (let item of array) {
+        array.forEach(item => {
             if (item === defaultValue) {
                 opt += "<option value='" + item + "' selected>" + item + "</option>";
             } else {
                 opt += "<option value='" + item + "'>" + item + "</option>";
             }
-        }
+        });
         element.innerHTML = opt;
     }
 }
 
 // sotable list
-{
-    Sortable.create(list1, { group: "idol", animation: 100,
-    onSort: function() {
-        Sort();
-        Caluculate();
-    }});
+function Start() {
+    Sortable.create(list1, {
+        group: "idol", animation: 100,
+        onSort: _ => {
+            Sort();
+            Caluculate();
+            CaluculateSkills();
+        }
+    });
 
-    Sortable.create(list2, { group: "idol", animation: 100, 
-    onSort: function() {
-        Sort();
-        Caluculate();
-    }});
+    Sortable.create(list2, {
+        group: "idol", animation: 100,
+        onSort: _ => {
+            Sort();
+            Caluculate();
+            CaluculateSkills();
+        }
+    });
 
-    let array = getIdolArray();
+    const array = getIdolArray();
     let insert = "";
-    for (let id = 0; id < array.length; id++) {
+    array.forEach(item => {
         insert += "<table><tr>"
-        insert += "<td class=\"idolName\" id=" + id + ">" + array[id].Name + "</td>";
-        insert += "<td class=\"td-at\">" + array[id].Attribute + "</td>";
-        insert += "<td class=\"td-d\">" + array[id].Dance + "</td>";
-        insert += "<td class=\"td-v\">" + array[id].Vocal + "</td>";
-        insert += "<td class=\"td-a\">" + array[id].Act + "</td>";
-        insert += "<td class=\"td-s\">" + array[id].Skill + "</td>";
-        insert += "<td class=\"td-sl\">" + array[id].SkillLevel + "</td>";
-        insert += "<td class=\"td-ss\">" + array[id].SubSkill + "</td>";
-        insert += "<td class=\"td-ssl\">" + array[id].SubSkillLevel + "</td>";
+        insert += "<td><input type=\"checkbox\" name=remove value=\"" + item.ID + "\"></td>";
+        insert += "<td class=\"idolName\" id=" + item.ID + ">" + item.Name + "</td>";
+        insert += "<td>" + item.Attribute + "</td>";
+        insert += "<td>" + item.Dance + "</td>";
+        insert += "<td>" + item.Vocal + "</td>";
+        insert += "<td>" + item.Act + "</td>";
+        insert += "<td class=\"idolSkill\">" + item.Skill + "</td>";
+        insert += "<td>" + item.SkillLevel + "</td>";
+        insert += "<td class=\"idolSkill\">" + item.SubSkill + "</td>";
+        insert += "<td>" + item.SubSkillLevel + "</td>";
         insert += "</tr></table>\n";
-    }
+    });
     list1.innerHTML = insert;
+    list2.innerHTML = "";
+    Sort();
 }
 
 function Sort() {
@@ -149,6 +158,72 @@ function getIdolArray() {
 //     }
 // }
 
+// create button
+{
+    const createBtn = document.getElementById("createBtn");
+    createBtn.onclick = function () {
+        const getStr = localStorage.getItem(KEY);
+        let idols = JSON.parse(getStr);
+
+        let newIdol = {};
+        newIdol["ID"] = idols.length;
+        newIdol["Name"] = document.getElementById("create-name").value;
+        newIdol["Attribute"] = document.getElementById("create-attribute").value;
+        newIdol["Dance"] = String(document.getElementById("create-dance").value);
+        newIdol["Vocal"] = String(document.getElementById("create-vocal").value);
+        newIdol["Act"] = String(document.getElementById("create-act").value);
+        newIdol["Skill"] = document.getElementById("create-skill").value;
+        newIdol["SkillLevel"] = String(document.getElementById("create-skilllevel").value);
+        newIdol["SubSkill"] = document.getElementById("create-subskill").value;
+        newIdol["SubSkillLevel"] = String(document.getElementById("create-subskilllevel").value);
+        
+        idols.push(newIdol);
+        const setStr = JSON.stringify(idols)
+        localStorage.setItem(KEY, setStr);
+        Start();
+    };
+}
+
+// delete button
+{
+    const removeBtn = document.getElementById("removeBtn");
+    removeBtn.onclick = function () {
+        const removeIdols = Array.from(document.getElementsByName("remove"))
+                               .filter( value => value.checked === true );
+        const getStr = localStorage.getItem(KEY);
+        let idols = JSON.parse(getStr);
+
+        removeIdols.forEach(removeIdol => { 
+            idols = idols.filter(n => n.ID !== Number(removeIdol.value));
+        });
+        idols.forEach((idol, index) => idol.ID = index);
+        const setStr = JSON.stringify(idols)
+        localStorage.setItem(KEY, setStr);
+        Start();
+    };
+}
+
+// input file
+if(window.File) {
+    var select = document.getElementById('select');
+ 
+    // ファイルが選択されたとき
+    select.addEventListener('change', function(e) {
+        // 選択されたファイルの情報を取得
+        var fileData = e.target.files[0];
+ 
+        var reader = new FileReader();
+        reader.onerror = function() { alert('ファイル読み取りに失敗しました') }
+        reader.onload = function() { 
+            saveReadData(reader.result);
+            Start();
+        };
+ 
+        // ファイル読み取りを実行
+        reader.readAsText(fileData, 'Shift_JIS');
+    }, false);
+}
+
 function saveReadData(result) {
     // 行単位で配列にする
     var lineArr = result.split('\n');
@@ -176,36 +251,47 @@ function saveReadData(result) {
     localStorage.setItem(KEY, str);
 }
 
-// input file
-if(window.File) {
-    var select = document.getElementById('select');
- 
-    // ファイルが選択されたとき
-    select.addEventListener('change', function(e) {
-        // 選択されたファイルの情報を取得
-        var fileData = e.target.files[0];
- 
-        var reader = new FileReader();
-        reader.onerror = function() { alert('ファイル読み取りに失敗しました') }
-        reader.onload = function() { saveReadData(reader.result) };
- 
-        // ファイル読み取りを実行
-        reader.readAsText(fileData, 'Shift_JIS');
-    }, false);
+// skills
+function CaluculateSkills() {
+    const elements = Array.from(document.getElementsByClassName("idolName")).filter((n, i) => i < 7);
+    let skills = [], subskills = [];
+    elements.forEach(element => {
+        const idol = new Idol(element.id)
+        if (idol.Skill in skills == true) {
+            skills[idol.Skill] += Number(idol.SkillLevel);
+        } else {
+            skills[idol.Skill] = Number(idol.SkillLevel);
+        }
+        if (idol.SubSkill in subskills == true) {
+            subskills[idol.SubSkill] += Number(idol.SubSkillLevel);
+        } else {
+            subskills[idol.SubSkill] = Number(idol.SubSkillLevel);
+        }
+    });
+    let str = "";
+    for (let skill in skills) {
+        str += "<div>" + skill + ":" + skills[skill] + "</div>\n";
+    }
+    document.getElementById("skills").innerHTML = str;
+    str = "";
+    for (let skill in subskills) {
+        str += "<div>" + skill + ":" + subskills[skill] + "</div>\n";
+    }
+    document.getElementById("subskills").innerHTML = str;
 }
 
 // calculate total
 function Caluculate() {
-    let elements = document.getElementsByClassName("idolName") ;
+    let elements = Array.from(document.getElementsByClassName("idolName")).filter((n, i) => i < 7);
     let total = 0;
-    for (let index = 0; index < TeamNumber;index++) {
-        let idol = new Idol(elements[index].id)
+    elements.forEach(element => {
+        let idol = new Idol(element.id)
         total += idol.Dance + idol.Vocal + idol.Act;
         total += getMainSkillBonus(idol);
         total += getFriendSkillBonus(idol);
         total += getAttributeBonus(idol);
         total += getEventBonus(idol);
-    }
+    });
     let resultElement = document.getElementById("result");
     resultElement.innerHTML = "totalPoint : " + total;
 }
@@ -282,5 +368,10 @@ function getEventBonus(idol) {
     }
 }
 
-Sort();
+Start();
 Caluculate();
+CaluculateSkills();
+
+//TODO: スキル、サブスキル合計を表示
+//TODO: ブロマイドの追加・削除
+//TODO: フィルター機能

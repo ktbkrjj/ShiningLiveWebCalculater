@@ -18,6 +18,9 @@ td {
 .idolName {
   width: 30%;
 }
-.td-s {
+.idolSkill {
   width: 15%;
+}
+.text-number {
+  width: 60px
 }
