@@ -116,12 +116,12 @@ function Sort() {
     let list2 = document.getElementById("list2");
     const all = Array.from(list1.children).concat(Array.from(list2.children));
     let str = "";
-    for (let index = 0; index < TeamNumber;index++) {
+    for (let index = 0; index < TeamNumber; index++) {
         str += "<table>" + all[index].innerHTML + "</table>\n";
     }
     list1.innerHTML = str;
     str = "";
-    for (let index = TeamNumber; index < all.length;index++) {
+    for (let index = TeamNumber; index < all.length; index++) {
         str += "<table>" + all[index].innerHTML + "</table>\n";
     }
     list2.innerHTML = str;
@@ -130,7 +130,7 @@ function Sort() {
 function getIdolArray() {
     let array = [];
     for (let id = 0; ; id++) {
-        let idol = new Idol(id);
+        const idol = new Idol(id);
         if (idol.data == null) { break; }
         array.push(idol);
     }
